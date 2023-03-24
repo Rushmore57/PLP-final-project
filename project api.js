@@ -24,7 +24,7 @@ searchButton.addEventListener('click', searchRecipes);
 function searchRecipes() {
   const query = searchInput.value;
 
-  axios.get(`https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&query=${query}&number=40&RecipeNutritionInformation=true`)
+  axios.get(`https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&query=${query}&number=100&addRecipeInformation=true`)
     .then(response => {
       const recipes = response.data.results;
 
@@ -51,41 +51,51 @@ function searchRecipes() {
 
         const addToFavButton = document.createElement('button');
         addToFavButton.textContent = 'Add to Favorite';
-        addToFavButton.className="addtofavbutton"
-        addToFavButton.addEventListener('click', function () { 
-          const recipeName = recipeTitle.textContent;
-          const recipeImage =  recipeImg.src;
-          const recipeSource = recipeLink.href;
-          const now = new Date();
-          const date = now.getDate() + '/' + (now.getMonth() + 1) + '/' + now.getFullYear();
-          const time = now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
-          const word = " at "
-          const BDnT = date + word +time; 
-          firebase
-          .database()
-          .ref("favorite recipes")
-          .push({
-            recipeName : recipeName,
-            recipeSource : recipeSource,
-            recipeImage : recipeImage,
-            dateAndTime : BDnT
-          });
-          document.getElementById("favouritediv").insertAdjacentHTML(
-            'beforeend',
-            `
-            <div class="favouritelist">
-            <div class="everyelse">
+addToFavButton.className = "addtofavbutton";
+addToFavButton.addEventListener('click', function () { 
+  const recipeName = recipeTitle.textContent;
+  const recipeImage =  recipeImg.src;
+  const recipeSource = recipeLink.href;
+  const now = new Date();
+  const date = now.getDate() + '/' + (now.getMonth() + 1) + '/' + now.getFullYear();
+  const time = now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
+  const word = " at ";
+  const BDnT = date + word + time; 
+  const ref = firebase.database().ref("favorite recipes");
+  // query the database for existing recipes with the same name
+  ref.orderByChild("recipeName").equalTo(recipeName).once("value", function(snapshot) {
+    if (snapshot.exists()) {
+      console.log("Recipe already exists in the database.");
+      window.alert("added successfully!.");
+    } else {
+      ref.push({
+        recipeName: recipeName,
+        recipeSource: recipeSource,
+        recipeImage: recipeImage,
+        dateAndTime: BDnT
+      });
+      console.log("Recipe added to favorites.");
+      document.getElementById("favouritediv").insertAdjacentHTML(
+        'beforeend',
+        `
+        <div class="favouritelist">
+          <div class="everyelse">
             <img src="${recipeImage}" class="fav_img">
             <div class="detail">
-                <h1 class="recipe_header"> ${recipeName}</h1>
-                <p class="recipe_date"> ${BDnT} </p>
+              <h1 class="recipe_header"> ${recipeName} <i class="fa-solid fa-heart-circle-check"></i> </h1>
+              <p class="recipe_date"><i class="fa-regular fa-calendar-days"></i> ${BDnT} </p>
             </div>
-            </div>
+          </div>
         </div>
+        `
+      );
+      addToFavButton.textContent="added";
+      addToFavButton.style.backgroundColor="lime";
+    }
+  });
+  
+});
 
-            `
-          )
-        });
         recipeDiv.appendChild(addToFavButton);
 
         const addToSavedButton = document.createElement('button');
@@ -93,11 +103,60 @@ function searchRecipes() {
         addToSavedButton.id = "savebtn";
         addToSavedButton.className = "tosavebtn";
         addToSavedButton.addEventListener('click', () => {
+
+          const recipeName = recipeTitle.textContent;
+          const recipeImage =  recipeImg.src;
+          const recipeSource = recipeLink.href;
+          const now = new Date();
+          const date = now.getDate() + '/' + (now.getMonth() + 1) + '/' + now.getFullYear();
+          const time = now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
+          const word = " at ";
+          const BDnT = date + word + time;
+          const databaseRef = firebase.database().ref(); 
+          const ref = databaseRef.child("saved recipes");
+          // query the database for existing recipes with the same name
+          ref.orderByChild("recipeName").equalTo(recipeName).once("value", function(snapshot) {
+            if (snapshot.exists()) {
+              alert("Saved successfully!!");
+            } else {
+              ref.push({
+                recipeName: recipeName,
+                recipeSource: recipeSource,
+                recipeImage: recipeImage,
+                dateAndTime: BDnT
+              });
+              console.log("Recipe saved to favorites.");
+              document.getElementById("saveddiv").insertAdjacentHTML(
+                'beforeend',
+                `
+                <div class="favouritelist">
+                  <div class="everyelse">
+                    <img src="${recipeImage}" class="fav_img">
+                    <div class="detail">
+                      <h1 class="saved_header"> ${recipeName} <i class="fa-regular fa-bookmark"></i></h1>
+                      <p class="saved_date"><i class="fa-regular fa-calendar-days"></i> ${BDnT} </p>
+                      <a class="eye_link" href="${recipeSource}"> <i class="fa-solid fa-utensils"></i> view recipe </a>
+                    </div>
+                  </div>
+                  <button type="button" class="favourite"><i class="fa-solid fa-heart"></i></button>
+                  <button type="button" class="tried"><i class="fa-solid fa-circle-check"></i></button>
+                  <button type="button" class="delete"><i class="fa-solid fa-trash-can"></i></button>
+
+                </div>
+
+                `
+              );
+              addToSavedButton.textContent="added";
+              addToSavedButton.style.backgroundColor="lime";
+            }
+          });
           // Code to add recipe to saved
         });
         recipeDiv.appendChild(addToSavedButton);
 
-        detailSection.appendChild(recipeDiv);
+        detailSection.appendChild(recipeDiv);        
+        
+        
       });
     })
     .catch(error => {
