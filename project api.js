@@ -150,7 +150,6 @@ addToFavButton.addEventListener('click', function () {
               addToSavedButton.style.backgroundColor="lime";
             }
           });
-          // Code to add recipe to saved
         });
         recipeDiv.appendChild(addToSavedButton);
 
