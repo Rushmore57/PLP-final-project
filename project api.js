@@ -13,7 +13,7 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-const apiKey = 'b016c6af72fa4e75901586a84e490d46'; 
+const apiKey = '164901c663694ab6b5cbdb39b3bed85a'; 
 
 const searchInput = document.getElementById('searcher');
 const searchButton = document.getElementById('searchbtn');
@@ -24,12 +24,15 @@ searchButton.addEventListener('click', searchRecipes);
 function searchRecipes() {
   const query = searchInput.value;
 
-  axios.get(`https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&query=${query}&number=100&addRecipeInformation=true`)
+  axios.get(`https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&query=${query}&number=20&addRecipeNutrition=true`)
     .then(response => {
       const recipes = response.data.results;
 
       detailSection.innerHTML = '';
-
+      if (recipes.length === 0) {
+        alert("oops,looks like we don't have that recipe. Make sure you typed it corectly.")
+      }
+      else{
       recipes.forEach(recipe => {
         const recipeDiv = document.createElement('div');
         recipeDiv.classList.add('recipe');
@@ -96,6 +99,7 @@ addToFavButton.addEventListener('click', function () {
   
 });
 
+
         recipeDiv.appendChild(addToFavButton);
 
         const addToSavedButton = document.createElement('button');
@@ -150,6 +154,7 @@ addToFavButton.addEventListener('click', function () {
               addToSavedButton.style.backgroundColor="lime";
             }
           });
+          // Code to add recipe to saved
         });
         recipeDiv.appendChild(addToSavedButton);
 
@@ -157,7 +162,7 @@ addToFavButton.addEventListener('click', function () {
         
         
       });
-    })
+};})
     .catch(error => {
       console.error(error);
     });
