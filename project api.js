@@ -159,68 +159,7 @@ addToFavButton.addEventListener('click', function () {
         recipeDiv.appendChild(addToSavedButton);
 
         detailSection.appendChild(recipeDiv); 
-        
-        var Favourite = document.getElementById("favdiv");
-Favourite.addEventListener('click', function () {
-  const ref = firebase.database().ref("favorite recipes");
-  const recipeTitle = document.getElementById("recipeTitle").textContent;
-  const recipeImg = document.getElementById("recipeImg");
-  const recipeLink = document.getElementById("recipeLink");
-  const now = new Date();
-  const date = now.getDate() + '/' + (now.getMonth() + 1) + '/' + now.getFullYear();
-  const time = now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
-  const word = " at ";
-  const BDnT = date + word + time;
-
-  ref.orderByChild("recipeName").equalTo(recipeTitle).once("value", function(snapshot) {
-    if (snapshot.exists()) {
-      const recipe = snapshot.val()[recipeTitle];
-      const recipeName = recipe.recipeName;
-      const recipeImage = recipe.recipeImage;
-      const recipeSource = recipe.recipeSource;
-
-      const favDiv = document.getElementById("favouritediv");
-      if (favDiv.hasChildNodes()) {
-        favDiv.removeChild(favDiv.childNodes[0]);
-      }
-
-      const favList = document.createElement('div');
-      favList.className = 'favouritelist';
-      favList.innerHTML = `
-        <div class="everyelse">
-          <img src="${recipeImage}" class="fav_img">
-          <div class="detail">
-            <h1 class="saved_header"> ${recipeName} <i class="fa-regular fa-bookmark"></i></h1>
-            <p class="saved_date"><i class="fa-regular fa-calendar-days"></i> ${BDnT} </p>
-            <a class="eye_link" href="${recipeSource}"> <i class="fa-solid fa-utensils"></i> view recipe </a>
-          </div>
-        </div>
-        <button type="button" class="favourite"><i class="fa-solid fa-heart"></i></button>
-        <button type="button" class="tried"><i class="fa-solid fa-circle-check"></i></button>
-        <button type="button" class="delete"><i class="fa-solid fa-trash-can"></i></button>
-      `;
-      favDiv.appendChild(favList);
-    } else {
-      const favDiv = document.getElementById("favouritediv");
-      if (favDiv.hasChildNodes()) {
-        favDiv.removeChild(favDiv.childNodes[0]);
-      }
-
-      const infoDiv = document.createElement('div');
-      infoDiv.className = 'info';
-      infoDiv.innerHTML = `
-        <h1>
-          No Recipes Added Yet 
-        </h1>
-      `;
-      favDiv.appendChild(infoDiv);
-    }
-  });
-});
-
-        
-        
-        
+         
       });
   
 };})
